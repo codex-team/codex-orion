@@ -1,8 +1,9 @@
 package xyz.codex.orion
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import akka.event.{LoggingAdapter, Logging}
 import xyz.codex.orion.ParserDispatcher.{RussiaToday, Lenta, Twitter}
+import xyz.codex.orion.parser.RussiaTodayParser
 
 /**
   *
@@ -21,7 +22,8 @@ class ParserDispatcher extends Actor {
   override def receive: Receive = {
     case Twitter => logger.info("Parsing Twitter")
     case Lenta => logger.info("Parsing Lenta")
-    case RussiaToday => logger.info("Parsing Russia Today")
+    case RussiaToday => new RussiaTodayParser().run()
+    case _ => logger.info("received unknown message")
   }
 }
 

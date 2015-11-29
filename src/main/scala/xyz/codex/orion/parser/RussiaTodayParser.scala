@@ -4,7 +4,13 @@ package xyz.codex.orion.parser
   *
   * @author Nostr
   */
-// TODO write anything!!! 
 class RussiaTodayParser {
+
+  /**
+    * Main method
+    */
+  def run() {
+    println("RT parser is now working!")
+  }
 
 }
