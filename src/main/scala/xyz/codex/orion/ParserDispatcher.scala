@@ -1,9 +1,10 @@
 package xyz.codex.orion
 
-import akka.actor.{Props, Actor}
-import akka.event.{LoggingAdapter, Logging}
-import xyz.codex.orion.ParserDispatcher.{RussiaToday, Lenta, Twitter}
-import xyz.codex.orion.parser.RussiaTodayParser
+import akka.actor.{Actor, ActorSelection}
+import akka.event.{Logging, LoggingAdapter}
+import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
+import xyz.codex.orion.ParserDispatcher._
+import xyz.codex.orion.parser.Parser
 
 /**
   *
@@ -11,19 +12,25 @@ import xyz.codex.orion.parser.RussiaTodayParser
   */
 
 object ParserDispatcher {
-  case object Twitter
-  case object Lenta
-  case object RussiaToday
+  case class DispatcherTask(task: String, parser: Parser)
 }
 
 class ParserDispatcher extends Actor {
   private val logger: LoggingAdapter = Logging(context.system, this)
 
+  private val postProcessor: ActorSelection = context.actorSelection("../postProcessor")
+
   override def receive: Receive = {
-    case Twitter => logger.info("Parsing Twitter")
-    case Lenta => logger.info("Parsing Lenta")
-    case RussiaToday => new RussiaTodayParser().run()
-    case _ => logger.info("received unknown message")
+    case DispatcherTask(task, parser) =>
+      val mayBeArticleData = parser.parse(task)
+      logger.debug("Parsed article with data={}", mayBeArticleData)
+
+      mayBeArticleData match {
+        case Some(articleData) => postProcessor ! PostProcessArticle(articleData)
+        case None => logger.warning(s"Failed to parse $task")
+      }
+
+    case unknown => logger.warning("Failed to parse {}", unknown)
   }
 }
 

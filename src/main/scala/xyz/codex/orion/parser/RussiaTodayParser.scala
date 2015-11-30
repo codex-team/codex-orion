@@ -1,20 +1,17 @@
 package xyz.codex.orion.parser
 
-import scalaj.http._
+import xyz.codex.orion.ArticleData
+
 import scala.xml._
-import java.net._
-import scala.io.Source
+import scalaj.http._
 
 /**
   *
   * @author Nostr
   */
-class RussiaTodayParser {
+case object RussiaTodayParser extends Parser{
 
-  /**
-    * Main method
-    */
-  def run() {
+  override def parse(task: String): Option[ArticleData] = {
     println("RT parser is now working!")
     val response: HttpResponse[String] = Http("https://www.rt.com/rss/").asString
 
@@ -27,6 +24,7 @@ class RussiaTodayParser {
       }
     }
 
+    // FIXME return the meaning
+    None
   }
-
 }
