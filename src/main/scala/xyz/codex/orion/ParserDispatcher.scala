@@ -1,7 +1,7 @@
 package xyz.codex.orion
 
 import akka.actor.{Actor, ActorSelection}
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.Logging
 import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
 import xyz.codex.orion.ParserDispatcher._
 import xyz.codex.orion.parser.Parser
@@ -16,7 +16,7 @@ object ParserDispatcher {
 }
 
 class ParserDispatcher extends Actor {
-  private val logger: LoggingAdapter = Logging(context.system, this)
+  private val logger = Logging(context.system, this)
 
   private val postProcessor: ActorSelection = context.actorSelection("../postProcessor")
 

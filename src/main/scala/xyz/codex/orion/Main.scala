@@ -1,7 +1,8 @@
 package xyz.codex.orion
 
-import akka.actor.{ActorRef, Cancellable, ActorSystem, Props}
-import xyz.codex.orion.ParserDispatcher.{DispatcherTask, Twitter}
+import akka.actor.{ActorRef, ActorSystem, Props}
+import xyz.codex.orion.ParserDispatcher.DispatcherTask
+import xyz.codex.orion.parser.RussiaTodayParser
 
 import scala.concurrent.duration._
 

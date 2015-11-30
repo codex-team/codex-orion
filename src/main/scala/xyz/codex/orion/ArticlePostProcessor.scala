@@ -2,7 +2,6 @@ package xyz.codex.orion
 
 import akka.actor.Actor
 import akka.event.Logging
-import com.typesafe.scalalogging.Logger
 import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
 
 /**
@@ -14,7 +13,7 @@ object ArticlePostProcessor {
 }
 
 class ArticlePostProcessor extends Actor{
-  private val logger = new Logger(Logging(context.system, this))
+  private val logger = Logging(context.system, this)
 
   override def receive: Receive = {
     case PostProcessArticle(article) =>
