@@ -6,4 +6,5 @@ scalaVersion := "2.11.7"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.1"
 libraryDependencies += "com.typesafe.akka" % "akka-slf4j_2.11" % "2.4.0"
-
+libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.0.0"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.2"
