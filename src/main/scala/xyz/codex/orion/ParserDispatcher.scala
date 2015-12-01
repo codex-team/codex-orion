@@ -6,6 +6,8 @@ import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
 import xyz.codex.orion.ParserDispatcher._
 import xyz.codex.orion.parser.Parser
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   *
   * @author eliseev
@@ -22,15 +24,18 @@ class ParserDispatcher extends Actor {
 
   override def receive: Receive = {
     case DispatcherTask(task, parser) =>
-      val mayBeArticleData = parser.parse(task)
-      logger.debug("Parsed article with data={}", mayBeArticleData)
+      logger.debug(s"Dispatching task $task to parser $parser")
 
-      mayBeArticleData match {
-        case Some(articleData) => postProcessor ! PostProcessArticle(articleData)
-        case None => logger.warning(s"Failed to parse $task")
-      }
+      parser.parseAsync(task).collect({
+          case Some(articleData) =>
+            logger.debug(s"Parsed article '${articleData.title}' (${articleData.url})")
+            postProcessor ! PostProcessArticle(articleData)
 
-    case unknown => logger.warning("Failed to parse {}", unknown)
+          case None =>
+            logger.warning(s"Failed to parse $task task")
+        })
+
+    case unknown => logger.warning(s"Failed to parse $unknown")
   }
 }
 
