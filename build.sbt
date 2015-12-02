@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
 
   // -- Http clients
   "org.scalaj" %% "scalaj-http" % "2.0.0",
-  "org.scala-lang.modules" %% "scala-xml" % "1.0.2"
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
+  "org.jsoup" % "jsoup" % "1.8.3"
 )
 
 libraryDependencies ++= {
