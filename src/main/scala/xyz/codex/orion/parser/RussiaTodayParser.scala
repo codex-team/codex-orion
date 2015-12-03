@@ -22,7 +22,7 @@ class RTArticleProcessor extends Actor {
     val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(link.toString()).asString
 
     if (response.code != 200) {
-      logger.error("FAILED to GET: %s WITH CODE %s".format(response.location, response.code))
+      logger.warning("FAILED to GET: %s WITH CODE %s".format(response.location, response.code))
       return None
     }
 
@@ -37,7 +37,7 @@ class RTArticleProcessor extends Actor {
     case RTArticle(link) =>
       parse(link)
     case unknown =>
-      println("ERROR")
+      logger.warning("Unknown message received: %s".format(unknown))
   }
   // TODO: Is this actor closed?
 }
