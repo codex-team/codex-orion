@@ -12,7 +12,7 @@ object ArticlePostProcessor {
   case class PostProcessArticle(article: ArticleData)
 }
 
-class ArticlePostProcessor extends Actor{
+class ArticlePostProcessor extends Actor {
   private val logger = Logging(context.system, this)
 
   override def receive: Receive = {
