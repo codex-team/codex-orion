@@ -4,13 +4,16 @@ import akka.actor._
 import java.net.URL
 import akka.event.Logging
 import org.jsoup.Jsoup
+import xyz.codex.orion.parser.RTArticleProcessor.RTArticle
 import xyz.codex.orion.{ArticlePostProcessor, ArticleData}
 import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
 import scala.xml.XML
 
-case class RTArticle(link : URL) {}
+object RTArticleProcessor {
+  case class RTArticle(link : URL) {}
+}
 
-case class RTArticleProcessor() extends Actor {
+class RTArticleProcessor extends Actor {
 
   val postProcessor: ActorRef = context.actorOf(Props[ArticlePostProcessor], "postProcessor")
   private val logger = Logging(context.system, this)
