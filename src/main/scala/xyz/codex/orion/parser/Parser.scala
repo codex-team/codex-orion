@@ -1,29 +1,51 @@
 package xyz.codex.orion.parser
 
-import xyz.codex.orion.ArticleData
+import java.net.URL
 
+import xyz.codex.orion.{ArticleData, GetLinksResult}
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
 /**
-  *
-  * @author eliseev
+  * Интерфейс базового парсера
+  * @author A. Menshikov (Nostr @dsnostr)
   */
-// TODO write anything!!! 
-trait Parser {
+trait BaseParser {
 
   /**
-    * Realization of parsing, synchronous method. Not visible in public api use [[Parser.parseAsync]] instead.
+    * Website parsing implementation, synchronous method.
+    * It's not visible on public api, use [[BaseParser.getLinksAsync]] instead.
     */
-  protected def parse(task: String): Option[ArticleData]
+  protected def getLinks(): Option[List[URL]]
 
 
   /**
-    * Public method to parse articles.
+    * Article link parsing implementation, synchronous method.
+    * It's not visible on public api, use [[BaseParser.parseLinkAsync]] instead.
     */
-  def parseAsync(task: String)() = Future {
-    parse(task)
+  protected def parseLink(link : URL): Option[ArticleData]
+
+  /**
+    * Get ArticleDate from a link
+    * @return Option[ParsingResult]
+    */
+  def getLinksAsync()() = Future {
+    getLinks()
   }
 
+  /**
+    * Perform Website crawling
+    * @return Option[ParsingResult]
+    */
+  def parseLinkAsync(link : URL)() = Future {
+    parseLink(link)
+  }
+
+
+  /**
+    * Returns self name
+    * @return name : String
+    */
+  def getName() : String
 }

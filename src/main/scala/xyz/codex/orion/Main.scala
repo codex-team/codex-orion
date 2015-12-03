@@ -1,8 +1,6 @@
 package xyz.codex.orion
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import xyz.codex.orion.ParserDispatcher.DispatcherTask
-import xyz.codex.orion.parser.RussiaTodayParser
 
 import scala.concurrent.duration._
 
@@ -13,12 +11,10 @@ import scala.concurrent.duration._
 object Main extends App{
   val system = ActorSystem("MySystem")
 
-  val postProcessor: ActorRef = system.actorOf(Props[ArticlePostProcessor], "postProcessor")
-  val parserDispatcher = system.actorOf(Props[ParserDispatcher], "dispatcher")
-
   val sitesCrawler: ActorRef = system.actorOf(Props[SitesCrawler], "sitesCrawler")
+  val articlesGetter: ActorRef = system.actorOf(Props[ArticlesGetter], "articlesGetter")
 
-  sitesCrawler ! StartWorking
+  sitesCrawler ! LaunchCrawlersToGetLinks
 
   // Import implicit context ecexutor to process our tasks.
   import system.dispatcher
