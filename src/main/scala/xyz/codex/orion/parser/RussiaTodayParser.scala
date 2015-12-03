@@ -2,6 +2,7 @@ package xyz.codex.orion.parser
 
 import akka.actor._
 import java.net.URL
+import akka.event.Logging
 import org.jsoup.Jsoup
 import xyz.codex.orion.{ArticlePostProcessor, ArticleData}
 import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
@@ -12,12 +13,13 @@ case class RTArticle(link : URL) {}
 case class RTArticleProcessor() extends Actor {
 
   val postProcessor: ActorRef = context.actorOf(Props[ArticlePostProcessor], "postProcessor")
+  private val logger = Logging(context.system, this)
 
   def parse(link : URL): Unit = {
     val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(link.toString()).asString
 
     if (response.code != 200) {
-      println("ERROR: ", response.location)
+      logger.error("FAILED to GET: %s WITH CODE %s".format(response.location, response.code))
       return None
     }
 
@@ -47,9 +49,9 @@ case object RussiaTodayParser extends Parser{
   val basicUrl : String = "https://www.rt.com/rss/"
 
   override def parse(task: String): Option[ArticleData] = {
-    println("RT parser is now working!")
-
     implicit val system = ActorSystem("MySystem")
+
+    println("RT parser is now working!")
 
     val articleProcessor = system.actorOf(Props[RTArticleProcessor], "article-processor")
 
@@ -68,6 +70,7 @@ case object RussiaTodayParser extends Parser{
       articleProcessor ! RTArticle(new URL(item \\ "link" text))
     }
 
+    // Nothing to return. RTArticle'll do everything.
     return None
   }
 }
