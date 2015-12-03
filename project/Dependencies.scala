@@ -21,6 +21,7 @@ object Dependencies {
 
   val scalajHttp        = "org.scalaj"                  %% "scalaj-http"            % "2.0.0"
   val scalaXml          = "org.scala-lang.modules"      %% "scala-xml"              % "1.0.2"
+  val jsoup             = "org.jsoup"                   %  "jsoup"                  % "1.8.3"
 
   // Logging
   val scalaLogging      = "com.typesafe.scala-logging"  %%  "scala-logging"         % "3.1.0"
