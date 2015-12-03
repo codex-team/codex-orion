@@ -54,8 +54,6 @@ case object RussiaTodayParser extends Parser{
   override def parse(task: String): Option[ArticleData] = {
     implicit val system = ActorSystem("MySystem")
 
-    println("RT parser is now working!")
-
     val articleProcessor = system.actorOf(Props[RTArticleProcessor], "article-processor")
 
     val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(basicUrl).asString
