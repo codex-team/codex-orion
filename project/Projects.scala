@@ -16,7 +16,8 @@ object Projects extends Build {
     settings(
      libraryDependencies ++=
         compile(akkaActor, akkaSlf4j, config, scopt, scalajHttp, scalaXml,
-          slf4jApi, scalaLogging) ++
-        test(akkaTestKit)
+          slf4jApi, scalaLogging, akkaStreams, sprayCan, spray, sprayRouting,
+          sprayJson) ++
+        test(akkaTestKit, sprayTestKit, specs2)
     )
 }

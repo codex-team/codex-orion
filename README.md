@@ -1,2 +1,2 @@
 # Orion by CodeX
-Read more on codex.xyz.
+Read more on [codex.xyz](codex.xyz).

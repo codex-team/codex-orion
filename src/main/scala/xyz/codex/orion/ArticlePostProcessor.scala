@@ -1,7 +1,6 @@
 package xyz.codex.orion
 
-import akka.actor.Actor
-import akka.event.Logging
+import akka.actor.{Actor, ActorLogging}
 import xyz.codex.orion.ArticlePostProcessor.PostProcessArticle
 
 /**
@@ -12,14 +11,13 @@ object ArticlePostProcessor {
   case class PostProcessArticle(article: ArticleData)
 }
 
-class ArticlePostProcessor extends Actor {
-  private val logger = Logging(context.system, this)
+class ArticlePostProcessor extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case PostProcessArticle(article) =>
-      logger.info(s"Handling article from url=${article.url} with title=${article.title}")
+      log.info(s"Handling article from url=${article.url} with title=${article.title}")
 
-      logger.debug(s"Handling article from url=${article.url} with title=${article.title} " +
+      log.debug(s"Handling article from url=${article.url} with title=${article.title} " +
         s"with text=${article.text}, comments=${article.comments}.")
   }
 }
