@@ -1,15 +1,17 @@
 package xyz.codex.orion.common
 
-import javax.crypto
-import java.nio.charset.Charset
-import spray.http.{HttpEntity, MediaTypes, ContentType, HttpRequest}
-import spray.http.HttpHeaders.RawHeader
-import org.parboiled.common.Base64
-import scala.collection.immutable.TreeMap
 import java.net.URLEncoder
+import java.nio.charset.Charset
+import javax.crypto
+
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.RawHeader
+import org.parboiled.common.Base64
+
+import scala.collection.immutable.TreeMap
 
 /**
-  * Магическая реализация OAuth честно скопированная у eigengo/activator-spray.
+  * Магическая реализация OAuth версии 1.0 в понимании твиттера.
   *
   * @author eliseev
   */
@@ -24,15 +26,16 @@ object OAuth {
     val key = new crypto.spec.SecretKeySpec(bytes(keyString), SHA1)
     val mac = crypto.Mac.getInstance(SHA1)
 
-    { httpRequest: HttpRequest =>
+    {
+      httpRequest: HttpRequest =>
       val timestamp = (System.currentTimeMillis / 1000).toString
       // nonce is unique enough for our purposes here
       val nonce = System.nanoTime.toString
 
       // pick out x-www-form-urlencoded body
       val (requestParams, newEntity) = httpRequest.entity match {
-        case HttpEntity.NonEmpty(ContentType(MediaTypes.`application/x-www-form-urlencoded`, _), data) =>
-          val params = data.asString.split("&")
+        case HttpEntity.Strict(ContentType(MediaTypes.`application/x-www-form-urlencoded`, _), data) =>
+          val params = data.decodeString("UTF-8").split("&")
           val pairs = params.map { param =>
             val p = param.split("=")
             p(0) -> percentEncode(p(1))

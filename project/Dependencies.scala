@@ -16,6 +16,7 @@ object Dependencies {
   val akkaSlf4j         = "com.typesafe.akka"           %%  "akka-slf4j"                % akkaVersion
   val akkaCluster       = "com.typesafe.akka"           %%  "akka-cluster"              % akkaVersion
   val akkaStreams       = "com.typesafe.akka"           %%  "akka-stream-experimental"  % "2.0-M2"
+  val akkaHttp          = "com.typesafe.akka"           %%  "akka-http-experimental"    % "2.0-M2"
 
   val akkaTestKit       = "com.typesafe.akka"           %%  "akka-testkit"              % akkaVersion
 

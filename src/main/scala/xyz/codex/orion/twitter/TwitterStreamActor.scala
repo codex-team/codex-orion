@@ -1,11 +1,12 @@
 package xyz.codex.orion.twitter
 
-import akka.actor.{ActorLogging, Actor, ActorRef}
-import akka.io.IO
-import spray.can.Http
-import spray.client.pipelining._
-import spray.http._
+import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.OutgoingConnection
+import akka.http.scaladsl.model._
+import akka.stream.scaladsl.{Flow, _}
 
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 /**
@@ -17,28 +18,28 @@ object TwitterStreamActor {
 }
 
 class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller
-  with ActorLogging {
+  with ActorLogging with ImplicitMaterializer {
 
   this: TwitterAuthorization =>
 
+  import context._
 
-  val io = IO(Http)(context.system)
+  private val streamConnection: Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]] =
+    Http().outgoingConnectionTls("stream.twitter.com", log = log)
+
 
   override def receive: Receive = {
     case query: String =>
-      log
+      log.info(query)
 
-      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`),
-        s"track=$query")
-      val rq = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
+      val result = Source
+        .single(authorize(HttpRequest(uri = uri, method = HttpMethods.POST, entity = body)))
+        .via(streamConnection)
+        .runForeach(h => log.error(h.toString))
 
-      sendTo(io).withResponsesReceivedBy(self)(rq)
-    case ChunkedResponseStart(_) =>
-
-    case MessageChunk(entity, _) =>
-      TweetUnmarshaller(entity).fold(_ => (), processor !)
-
-    case _ =>
+    case x =>
+      log.error(x.toString)
   }
 }
 
