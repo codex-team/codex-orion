@@ -2,9 +2,10 @@ package xyz.codex.orion.parser
 
 import java.net.URL
 
-import xyz.codex.orion.{ArticleData, GetLinksResult}
-import scala.concurrent.Future
+import xyz.codex.orion.ArticleData
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 /**

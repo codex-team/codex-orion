@@ -16,7 +16,7 @@ object Projects extends Build {
     settings(
      libraryDependencies ++=
         compile(akkaActor, akkaSlf4j, config, scopt, scalajHttp, scalaXml,
-          slf4jApi, scalaLogging, jsoup) ++
+          slf4jApi, scalaLogging, jsoup, akkaStream) ++
         test(akkaTestKit)
     )
 }
