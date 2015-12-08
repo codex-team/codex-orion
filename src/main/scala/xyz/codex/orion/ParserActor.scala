@@ -1,7 +1,7 @@
 package xyz.codex.orion
 
 import akka.actor.{Props, Actor}
-import xyz.codex.orion.parser.{GetLinksResult, BaseParser}
+import xyz.codex.orion.parser.BaseParser
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**

@@ -3,11 +3,12 @@ package xyz.codex.orion
 import java.net.URL
 
 import akka.actor.{Actor, Props}
-import xyz.codex.orion.parser.{GetLinksResult, ArticlesParser, BaseParser}
+import xyz.codex.orion.parser.{ArticlesParser, BaseParser}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 case class GetArticleData(articleData : ArticleData)
+case class GetLinksResult(parser : BaseParser, result : List[URL])
 
 
 /**

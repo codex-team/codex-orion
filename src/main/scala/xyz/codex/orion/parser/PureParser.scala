@@ -4,7 +4,6 @@ import java.net.URL
 import xyz.codex.orion.ArticleData
 
 
-case class GetLinksResult(parser : BaseParser, result : List[URL])
 
 
 /**

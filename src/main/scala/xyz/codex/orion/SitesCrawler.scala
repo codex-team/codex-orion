@@ -1,7 +1,7 @@
 package xyz.codex.orion
 
 import akka.actor._
-import xyz.codex.orion.parser.{PureParser, BaseParser}
+import xyz.codex.orion.parser.{RTParser, PureParser, BaseParser}
 
 
 case class StartCrawling(parser : BaseParser)
@@ -14,7 +14,7 @@ case class LaunchCrawlersToGetLinks()
 class SitesCrawler extends Actor with akka.actor.ActorLogging {
 
   private val crawlersList = Map(
-    context.actorOf(Props[ParserActor]) -> StartCrawling(new PureParser)
+    context.actorOf(Props[ParserActor]) -> StartCrawling(new RTParser)
   )
 
   override def receive = {
