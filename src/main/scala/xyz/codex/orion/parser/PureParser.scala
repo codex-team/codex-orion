@@ -14,12 +14,13 @@ case class GetLinksResult(parser : BaseParser, result : List[URL])
 class PureParser extends BaseParser {
 
   override def getLinks(): Option[List[URL]] = {
-    val result : List[URL] = List.fill(100)(new URL("http://www.rt.com/"))
+    val result : List[URL] = List.fill(16)(new URL("http://www.rt.com/"))
     Some(result)
     //Some(List(new URL("http://www.rt.com/"),new URL("http://www.rt.com/")))
   }
 
   override def parseLink(link : URL): Option[ArticleData] = {
+    Thread.sleep(5000)
     Some(new ArticleData(publisher = "RT", url = link, title = "title", text = "text"))
   }
 
