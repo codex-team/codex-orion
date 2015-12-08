@@ -32,6 +32,11 @@ object Dependencies {
   val slf4jJul          = "org.slf4j"                   %   "jul-to-slf4j"          % slf4jVersion
   val slf4jLog4j        = "org.slf4j"                   %   "log4j-over-slf4j"      % slf4jVersion
 
+  // Database
+  val akkaPersistence   = "com.typesafe.akka"           %%  "akka-persistence"      % akkaVersion
+  val mongoDb           = "com.github.ironfish"         %%  "akka-persistence-mongo-casbah"  % "0.7.6"
+  val salat             = "com.novus"                   %%  "salat"                 % "1.9.9"
+
   def compile   (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "compile")
   def provided  (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "provided")
   def test      (deps: ModuleID*): Seq[ModuleID] = deps map (_ % "test")

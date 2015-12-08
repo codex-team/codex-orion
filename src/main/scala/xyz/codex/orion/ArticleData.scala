@@ -14,7 +14,7 @@ import java.net.URL
   * @param socialAccountStat    map from social media name to number of reposts (likes) if present.
   */
 case class ArticleData(publisher: String,
-                  url: URL,
+                  url: String,
                   title: String,
                   text: String,
                   comments: Option[List[String]] = Option.empty,

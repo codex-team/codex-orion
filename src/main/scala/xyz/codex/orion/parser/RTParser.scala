@@ -49,7 +49,7 @@ class RTParser extends BaseParser {
       val html = Jsoup.parse(response.body)
       val title = html.select("h1").first().text()
       val text = html.getElementsByClass("article__text").toString()
-      return Some(new ArticleData(publisher = "RT", title = title, text = text, url = link))
+      return Some(new ArticleData(publisher = "RT", title = title, text = text, url = link.toString()))
     }
   }
 

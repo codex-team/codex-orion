@@ -20,7 +20,7 @@ class PureParser extends BaseParser {
 
   override def parseLink(link : URL): Option[ArticleData] = {
     Thread.sleep(5000)
-    Some(new ArticleData(publisher = "RT", url = link, title = "title", text = "text"))
+    Some(new ArticleData(publisher = "RT", url = link.toString(), title = "title", text = "text"))
   }
 
   override def getName() : String = { return "PureParser" }
