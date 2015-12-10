@@ -29,7 +29,7 @@ object Main extends App{
     new TwitterStreamActor(TwitterStreamActor.twitterUri, analytic)
       with OAuthTwitterAuthorization), "twitter-parser")
 
-  twitterStream ! "lol"
+  twitterStream ! "twitter"
 
   // TODO во время тика можно делать намного более хитрую логику, в том числе определять пул задач и приоритеты для выполнения парсинга.
   // Парсинг должен проходить в несколько шагов, в первую очередь определение приоритетов и списка статей, далее отсылка заданий парсерам и третье, сбор всей информации в одном месте

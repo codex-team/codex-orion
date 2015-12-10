@@ -18,7 +18,7 @@ object TwitterStreamActor {
 }
 
 class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller
-  with ActorLogging with ImplicitMaterializer {
+with ActorLogging with ImplicitMaterializer {
 
   this: TwitterAuthorization =>
 
@@ -33,13 +33,14 @@ class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
       log.info(query)
 
       val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
+      val authorize1 = authorize(HttpRequest(uri = uri, method = HttpMethods.POST, entity = body))
       val result = Source
-        .single(authorize(HttpRequest(uri = uri, method = HttpMethods.POST, entity = body)))
+        .single(authorize1)
         .via(streamConnection)
-        .runForeach(h => log.error(h.toString))
-
+        .runForeach(x => log.info(x.toString))
     case x =>
       log.error(x.toString)
+
   }
 }
 
@@ -48,6 +49,7 @@ trait TwitterAuthorization {
 }
 
 trait OAuthTwitterAuthorization extends TwitterAuthorization {
+
   import xyz.codex.orion.common.OAuth._
 
   val consumer = Consumer("LHpEoPpHCOysM13hdalV8Y93Q",
