@@ -15,7 +15,7 @@ import scala.collection.immutable.TreeMap
   *
   * @author eliseev
   */
-object Oauth {
+object OAuth {
 
   case class Consumer(key: String, secret: String)
 
