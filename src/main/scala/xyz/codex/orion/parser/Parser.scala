@@ -1,11 +1,7 @@
 package xyz.codex.orion.parser
 
-import java.net.URL
-
 import xyz.codex.orion.ArticleData
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 
 /**
@@ -15,33 +11,16 @@ import scala.concurrent.Future
 trait BaseParser {
 
   /**
-    * Website parsing implementation, synchronous method.
-    * It's not visible on public api, use [[BaseParser.getLinksAsync]] instead.
+    * Parse RSS or other sources and return links to articles from one by one
     */
-  protected def getLinks(): Option[List[URL]]
+  def getLinks(): Seq[Option[String]]
 
 
   /**
-    * Article link parsing implementation, synchronous method.
-    * It's not visible on public api, use [[BaseParser.parseLinkAsync]] instead.
+    * Parse article data and return it
+    * @param link - string URL
     */
-  protected def parseLink(link : URL): Option[ArticleData]
-
-  /**
-    * Get ArticleDate from a link
-    * @return Option[ParsingResult]
-    */
-  def getLinksAsync()() = Future {
-    getLinks()
-  }
-
-  /**
-    * Perform Website crawling
-    * @return Option[ParsingResult]
-    */
-  def parseLinkAsync(link : URL)() = Future {
-    parseLink(link)
-  }
+  def getArticle(link : String): Option[ArticleData]
 
 
   /**

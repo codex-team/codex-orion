@@ -1,6 +1,7 @@
 package xyz.codex.orion
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import xyz.codex.orion.parser.ArticlesParser
 
 /**
   *
@@ -9,7 +10,8 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 object Main extends App{
   val system = ActorSystem("MySystem")
 
-  val sitesCrawler: ActorRef = system.actorOf(Props[SitesCrawler], "sitesCrawler")
+  val articlesCrawlerDispatcher: ActorRef = system.actorOf(Props[ArticlesCrawlerDispatcher], "articlesCrawlerDispatcher")
+  val articlesParser: ActorRef = system.actorOf(Props[ArticlesParser], "articlesParser")
 
-  sitesCrawler ! LaunchCrawlersToGetLinks
+  articlesCrawlerDispatcher ! LaunchCrawlersToGetLinks
 }

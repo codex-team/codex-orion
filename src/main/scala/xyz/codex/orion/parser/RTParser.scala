@@ -3,46 +3,25 @@ package xyz.codex.orion.parser
 import java.net.URL
 import org.jsoup.Jsoup
 import xyz.codex.orion.ArticleData
-
+import org.slf4j.LoggerFactory
 import scala.xml.XML
 
 
 /**
-  * Test Parser implementation, which performs simple HTTP GET
+  * Russia Today Parser implementation
   * @author A. Menshikov (Nostr @dsnostr)
   */
 class RTParser extends BaseParser {
 
   val baseUrl : URL =  new URL("https://www.rt.com/rss/")
+  val logger  = LoggerFactory.getLogger(this.getClass)
 
-  override def getLinks(): Option[List[URL]] = {
-
-    var result : List[URL] = List()
-    val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(baseUrl.toString()).asString
-
-    if (response.code != 200) {
-      //logger.warning("FAILED to GET: %s WITH CODE %s".format(response.location, response.code))
-      println(response.code)
-      return None
-    }
-    else {
-      val xml = XML.loadString(response.body)
-      val items = xml \\ "item"
-
-      for (item <- items.take(5)) {
-        result :::= List(new URL(item \\ "link" text))
-      }
-      println(result)
-      return Some(result)
-    }
-  }
-
-  override def parseLink(link : URL): Option[ArticleData] = {
+  override def getArticle(link : String): Option[ArticleData] = {
 
     val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(link.toString()).asString
 
     if (response.code != 200) {
-      println(response.code, response.location)
+      logger.warn(s"Error code {$response.code} on {$response.location}")
       return None
     }
     else {
@@ -53,5 +32,20 @@ class RTParser extends BaseParser {
     }
   }
 
-  override def getName() : String = { return "RTParser" }
+  override def getLinks() : Seq[Option[String]] = {
+    val response: scalaj.http.HttpResponse[String] = scalaj.http.Http(baseUrl.toString()).asString
+
+    if (response.code != 200) {
+      logger.warn(s"Error code {$response.code} on {$response.location}")
+      return Seq(None)
+    }
+    else {
+      val xml = XML.loadString(response.body)
+      val items = xml \\ "item"
+
+      for (item <- items.take(5)) yield Some(item \\ "link" text)
+    }
+  }
+
+  override def getName() : String = "RTParser"
 }
