@@ -3,8 +3,13 @@ package xyz.codex.orion.twitter
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.OutgoingConnection
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.scaladsl.{Flow, _}
+import spray.json._
+import xyz.codex.orion.Logging
+import xyz.codex.orion.twitter.TwitterDSL.Tweet
 
 import scala.concurrent.Future
 import scala.language.postfixOps
@@ -17,8 +22,31 @@ object TwitterStreamActor {
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
 }
 
-class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller
-with ActorLogging with ImplicitMaterializer {
+
+object TwitterJsonProtocol extends DefaultJsonProtocol {
+
+  implicit object TweetJsonFormat extends RootJsonFormat[Option[Tweet]] with Logging {
+    override def read(value: JsValue) = value match {
+      case o: JsObject =>
+        o.getFields("text", "retweet_count", "id") match {
+          case Seq(JsString(text), JsNumber(retweetCount), JsString(id)) =>
+            Some(new Tweet(id, text, retweetCount.intValue()))
+          case _ =>
+            log.warn("Failed to parse tweet")
+            None
+        }
+      case x =>
+        log.warn("Non-object obtained")
+        None
+    }
+
+    override def write(obj: Option[Tweet]): JsValue = JsArray()
+  }
+
+}
+
+class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor
+with ActorLogging with ImplicitMaterializer with SprayJsonSupport {
 
   this: TwitterAuthorization =>
 
@@ -30,16 +58,29 @@ with ActorLogging with ImplicitMaterializer {
 
   override def receive: Receive = {
     case query: String =>
-      log.info(query)
+      log.info(s"Starting work with Twitter Stream Api, tracking '$query'")
 
       val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
-      val authorize1 = authorize(HttpRequest(uri = uri, method = HttpMethods.POST, entity = body))
       val result = Source
-        .single(authorize1)
+        .single(authorize(HttpRequest(uri = uri, method = HttpMethods.POST, entity = body)))
         .via(streamConnection)
-        .runForeach(x => log.info(x.toString))
+        .map(sourceInChunkedResponse)
+        .filter(_.isDefined)
+        .map(_.get)
+        .map(x => Unmarshal(x).to[List[Option[Tweet]]])
+        .runForeach(x => x.onComplete(x => log.warning(s"$x")))
     case x =>
       log.error(x.toString)
+
+  }
+
+  def sourceInChunkedResponse: (HttpResponse) => Option[HttpEntity] = {
+
+    case HttpResponse(StatusCodes.OK, _, entity, _) =>
+      Some(entity)
+    case unexpectedResponse =>
+      log.warning(s"Unexpected response: $unexpectedResponse")
+      None
 
   }
 }
