@@ -1,6 +1,6 @@
 package xyz.codex.orion.twitter
 
-import akka.actor.{ActorLogging, Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.io.IO
 import spray.can.Http
 import spray.client.pipelining._
@@ -25,20 +25,33 @@ class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   val io = IO(Http)(context.system)
 
   override def receive: Receive = {
-    case query: String =>
-      log
+    case users: List[Int] =>
+      log.info(s"Starting the twitter stream for users: $users")
 
-      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`),
-        s"track=$query")
-      val rq = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+      val query: String = s"follow=${users.mkString(",")}"
 
-      sendTo(io).withResponsesReceivedBy(self)(rq)
+      sendRequest(query)
+    case track: String =>
+      log.info(s"Starting the twitter stream for users: $track")
+
+      val query: String = s"track=$track"
+
+      sendRequest(query)
     case ChunkedResponseStart(_) =>
-
+      log.info("Start to process twitter stream")
     case MessageChunk(entity, _) =>
-      TweetUnmarshaller(entity).fold(_ => (), processor !)
 
-    case _ =>
+      // FIXME here and in Akka Streams we faced the same problem, some json breaks in 2 or more chunks =(
+      TweetUnmarshaller(entity).fold(_ => (), processor !)
+    case somethingElse =>
+      log.warning(s"Something wrong happened $somethingElse")
+  }
+
+  def sendRequest(entityString: String): Unit = {
+    val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), entityString)
+    val rq = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+
+    sendTo(io).withResponsesReceivedBy(self)(rq)
   }
 }
 
@@ -47,7 +60,7 @@ trait TwitterAuthorization {
 }
 
 trait OAuthTwitterAuthorization extends TwitterAuthorization {
-  import xyz.codex.orion.common.OAuth._
+  import xyz.codex.orion.common.Oauth._
 
   val consumer = Consumer("LHpEoPpHCOysM13hdalV8Y93Q",
     "E9sWTx1ha3HRQkHMbGsb7lg5ihxHHOcDAziRxLSt0TG2r4gZCe")

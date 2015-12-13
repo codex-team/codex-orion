@@ -9,12 +9,14 @@ import scala.collection.immutable.TreeMap
 import java.net.URLEncoder
 
 /**
-  * Магическая реализация OAuth честно скопированная у eigengo/activator-spray.
+  * Магическая реализация OAuth версии 1.0 в понимании твиттера.
   *
   * @author eliseev
   */
-object OAuth {
+object Oauth {
+
   case class Consumer(key: String, secret: String)
+
   case class Token(value: String, secret: String)
 
   def oAuthAuthorizer(consumer: Consumer, token: Token): HttpRequest => HttpRequest = {
@@ -24,10 +26,11 @@ object OAuth {
     val key = new crypto.spec.SecretKeySpec(bytes(keyString), SHA1)
     val mac = crypto.Mac.getInstance(SHA1)
 
-    { httpRequest: HttpRequest =>
+    {
+      httpRequest: HttpRequest =>
       val timestamp = (System.currentTimeMillis / 1000).toString
-      // nonce is unique enough for our purposes here
-      val nonce = System.nanoTime.toString
+      // It's just a unique string
+      val uniqueString = System.nanoTime.toString
 
       // pick out x-www-form-urlencoded body
       val (requestParams, newEntity) = httpRequest.entity match {
@@ -46,7 +49,7 @@ object OAuth {
         "oauth_consumer_key" -> consumer.key,
         "oauth_signature_method" -> "HMAC-SHA1",
         "oauth_timestamp" -> timestamp,
-        "oauth_nonce" -> nonce,
+        "oauth_nonce" -> uniqueString,
         "oauth_token" -> token.value,
         "oauth_version" -> "1.0"
       )
@@ -55,7 +58,7 @@ object OAuth {
       val encodedOrderedParams = (TreeMap[String, String]() ++ oauthParams ++ requestParams) map { case (k, v) => k + "=" + v } mkString "&"
       val url = httpRequest.uri.toString()
       // construct the signature base string
-      val signatureBaseString = percentEncode(httpRequest.method.toString() :: url :: encodedOrderedParams :: Nil)
+      val signatureBaseString = percentEncode(httpRequest.method.name :: url :: encodedOrderedParams :: Nil)
 
       mac.init(key)
       val sig = Base64.rfc2045().encodeToString(mac.doFinal(bytes(signatureBaseString)), false)

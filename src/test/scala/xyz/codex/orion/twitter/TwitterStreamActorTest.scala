@@ -6,7 +6,6 @@ import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import org.specs2.mutable.SpecificationLike
 import spray.can.Http
 import spray.http._
-import xyz.codex.orion.twitter.TwitterDSL.Tweet
 
 import scala.io.Source
 
@@ -15,9 +14,8 @@ import scala.io.Source
   *
   * @author eliseev
   */
-// TODO write anything!!! 
 class TwitterStreamActorTest extends TestKit(ActorSystem())
-  with SpecificationLike with ImplicitSender{
+with SpecificationLike with ImplicitSender {
   sequential
 
   val port = 12345
@@ -30,13 +28,12 @@ class TwitterStreamActorTest extends TestKit(ActorSystem())
 
     "Should unmarshal one tweet" in {
       val twitterApi = TwitterApi(port)
-      tweetStream ! "orion"  // our TwitterApi does not care
+      tweetStream ! "orion" // our TwitterApi does not care
 
       val tweet = expectMsgType[Tweet]
       tweet.text mustEqual "Aggressive Ponytail #freebandnames"
-      tweet.user.lang mustEqual "en"
-      tweet.user.id mustEqual "137238150"
-      tweet.place mustEqual None
+      tweet.favouritesCount mustEqual 0
+      tweet.retweetsCount mustEqual 0
       twitterApi.stop()
       success
     }
@@ -44,6 +41,16 @@ class TwitterStreamActorTest extends TestKit(ActorSystem())
 }
 
 class TwitterApi private(system: ActorSystem, port: Int, body: String) {
+
+  private val service = system.actorOf(Props(new Service))
+  private val io = IO(Http)(system)
+
+  def stop(): Unit = {
+    io ! Http.Unbind
+    system.stop(service)
+    system.stop(io)
+  }
+  io ! Http.Bind(service, "localhost", port = port)
 
   private class Service extends Actor {
 
@@ -55,16 +62,6 @@ class TwitterApi private(system: ActorSystem, port: Int, body: String) {
         sender ! MessageChunk(body = body)
         sender ! ChunkedMessageEnd()
     }
-  }
-
-  private val service = system.actorOf(Props(new Service))
-  private val io = IO(Http)(system)
-  io ! Http.Bind(service, "localhost", port = port)
-
-  def stop(): Unit = {
-    io ! Http.Unbind
-    system.stop(service)
-    system.stop(io)
   }
 }
 

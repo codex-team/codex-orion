@@ -1,7 +1,6 @@
 package xyz.codex.orion.twitter
 
 import akka.actor.{ActorLogging, Actor}
-import xyz.codex.orion.twitter.TwitterDSL.Tweet
 
 /**
   *
@@ -11,6 +10,9 @@ import xyz.codex.orion.twitter.TwitterDSL.Tweet
 class TwitterAnalytic extends Actor with ActorLogging{
   override def receive: Receive = {
     case tweet: Tweet =>
-      log.info(s"Accepted a $tweet")
+      if (tweet.retweetsCount > 10)
+        log.warning(s"Accepted a mega-urgent tweet: $tweet")
+      else
+        log.info(s"Just another tweet $tweet")
   }
 }
