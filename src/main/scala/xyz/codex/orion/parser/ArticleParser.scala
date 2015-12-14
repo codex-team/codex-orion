@@ -17,6 +17,6 @@ class ArticlesParser extends Actor with akka.actor.ActorLogging {
 
   override def receive = {
     case GetArticleData(articleData : ArticleData) =>
-      log.info(s"Parsed article '${articleData.title}' (${articleData.url})")
+      log.info(s"Parsed article '${articleData.title}' (${articleData.url}) with ${articleData.commentsCount} comments")
   }
 }
