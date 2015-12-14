@@ -13,7 +13,7 @@ case class LaunchCrawlersToGetLinks()
 class ArticlesCrawlerDispatcher extends Actor with ActorLogging {
 
   private val crawlersList = Map(
-    context.actorOf(Props[ParserActor]) -> LoadArticleLinks(new RTParser)
+    context.actorOf(Props[LinksLoaderActor]) -> LoadArticleLinks(new RTParser)
   )
 
   override def receive = {

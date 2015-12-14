@@ -10,9 +10,9 @@ case class LoadArticle(parser : BaseParser, link : String)
 /**
   * Created by nostr on 08.12.15.
   */
-class ParserActor extends Actor with ActorLogging {
+class LinksLoaderActor extends Actor with ActorLogging {
 
-  private val articlesParser = context.actorSelection("/user/articlesParser")
+  private val articlesLoader = context.actorSelection("/user/articlesLoader")
 
   override def receive = {
     case LoadArticleLinks(parser : BaseParser) =>
@@ -20,12 +20,23 @@ class ParserActor extends Actor with ActorLogging {
 
       parser.getLinks() foreach {
         case Some(link) =>
-          self ! LoadArticle(parser, link)
+          articlesLoader ! LoadArticle(parser, link)
         case None =>
           log.warning("Failed to load links")
       }
 
-    case LoadArticle(parser : BaseParser, link : String) =>
+    case _ =>
+      log.warning("Unknown message")
+  }
+}
+
+
+class ArticlesLoaderActor extends Actor with ActorLogging {
+
+  private val articlesParser = context.actorSelection("/user/articlesParser")
+
+  override def receive = {
+    case LoadArticle(parser: BaseParser, link: String) =>
       parser.getArticle(link) match {
         case Some(result) =>
           articlesParser ! GetArticleData(result)
