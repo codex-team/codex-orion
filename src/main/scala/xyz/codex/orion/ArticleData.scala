@@ -1,6 +1,7 @@
 package xyz.codex.orion
 
 import java.net.URL
+import java.util.{Calendar, Date}
 
 
 /**
@@ -20,6 +21,7 @@ case class ArticleData(publisher: String,
                   text: String,
                   comments: Option[List[String]] = Option.empty,
                   commentsCount: Option[Integer] = Option.empty,
-                  socialAccountStat: Option[Map[String, Integer]] = Option.empty) {
+                  socialAccountStat: Option[Map[String, Integer]] = Option.empty,
+                  updateTime: Date = Calendar.getInstance().getTime()) {
 
 }
