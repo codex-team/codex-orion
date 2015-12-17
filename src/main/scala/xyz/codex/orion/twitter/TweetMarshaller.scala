@@ -7,10 +7,10 @@ import spray.json._
 import scala.util.Try
 
 /**
+  * Simple unmarshaller just for demo.
   *
   * @author eliseev
   */
-// TODO write anything!!! 
 trait TweetMarshaller {
 
   implicit object TweetUnmarshaller extends Unmarshaller[Tweet] {
@@ -20,7 +20,8 @@ trait TweetMarshaller {
         val json = JsonParser(entity.asString).asJsObject
         (json.fields.get("id_str"), json.fields.get("text"), json.fields.get("favorite_count"),
               json.fields.get("retweet_count")) match {
-          case (Some(JsString(id)), Some(JsString(text)), Some(JsNumber(favoriteCount)), Some(JsNumber(retweetCount))) =>
+          case (Some(JsString(id)), Some(JsString(text)), Some(JsNumber(favoriteCount)),
+                  Some(JsNumber(retweetCount))) =>
             Right(Tweet(id, retweetCount.toInt, favoriteCount.toInt, text))
           case _ => Left(MalformedContent("bad tweet"))
         }

@@ -1,10 +1,10 @@
 package xyz.codex.orion
 
 /**
+  * Definition of DSL objects.
   *
   * @author eliseev
   */
-// TODO write anything!!! 
 package object twitter {
   case class Tweet(id: String, retweetsCount: Int, favouritesCount: Int, text: String)
 }

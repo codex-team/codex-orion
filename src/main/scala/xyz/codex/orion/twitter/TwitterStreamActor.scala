@@ -5,18 +5,26 @@ import akka.io.IO
 import spray.can.Http
 import spray.client.pipelining._
 import spray.http._
+import xyz.codex.orion.twitter.TwitterStreamActor.{TrackWords, FollowUsers}
 
 import scala.language.postfixOps
 
 /**
+  * Actor, that works with twitter streams.
+  * It starts connections to twitter streams api, unmarshalls chunked response
+  * and sends it to analytic actor.
   *
   * @author eliseev
   */
 object TwitterStreamActor {
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
+
+  case class FollowUsers(ids: List[Int])
+
+  case class TrackWords(trackedWords: List[String])
 }
 
-class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller
+class TwitterStreamActor(uri: Uri, twitterStreamAnalytic: ActorRef) extends Actor with TweetMarshaller
   with ActorLogging {
 
   this: TwitterAuthorization =>
@@ -25,24 +33,28 @@ class TwitterStreamActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   val io = IO(Http)(context.system)
 
   override def receive: Receive = {
-    case users: List[Int] =>
-      log.info(s"Starting the twitter stream for users: $users")
+    case FollowUsers(userIds) =>
+      log.info(s"Starting the twitter stream for user ids: $userIds")
 
-      val query: String = s"follow=${users.mkString(",")}"
-
-      sendRequest(query)
-    case track: String =>
-      log.info(s"Starting the twitter stream for users: $track")
-
-      val query: String = s"track=$track"
+      val query: String = s"follow=${userIds.mkString(",")}"
 
       sendRequest(query)
+
+    case TrackWords(trackedWords) =>
+      log.info(s"Starting the twitter stream for words: $trackedWords")
+
+      val query: String = s"track=${trackedWords.mkString(",")}"
+
+      sendRequest(query)
+
     case ChunkedResponseStart(_) =>
-      log.info("Start to process twitter stream")
+      log.info("Processing of twitter stream started.")
+
     case MessageChunk(entity, _) =>
 
       // FIXME here and in Akka Streams we faced the same problem, some json breaks in 2 or more chunks =(
-      TweetUnmarshaller(entity).fold(_ => (), processor !)
+      TweetUnmarshaller(entity).fold(_ => (), twitterStreamAnalytic !)
+
     case somethingElse =>
       log.warning(s"Something wrong happened $somethingElse")
   }

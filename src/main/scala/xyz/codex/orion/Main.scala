@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import xyz.codex.orion.ParserDispatcher.DispatcherTask
 import xyz.codex.orion.parser.RussiaTodayParser
+import xyz.codex.orion.twitter.TwitterStreamActor.TrackWords
 import xyz.codex.orion.twitter.{OAuthTwitterAuthorization, TwitterAnalytic, TwitterStreamActor}
 
 import scala.concurrent.duration.DurationInt
@@ -29,8 +30,8 @@ object Main extends App {
     new TwitterStreamActor(TwitterStreamActor.twitterUri, analytic)
       with OAuthTwitterAuthorization), "twitter-parser")
 
-  // FIXME uncomment to get the consoleful of twitter logs =)
-  twitterStream ! "ted"
+  // FIXME try to change words and see console full of logs.
+  twitterStream ! TrackWords(List("codex"))
 
   // TODO во время тика можно делать намного более хитрую логику, в том числе определять пул задач и приоритеты для выполнения парсинга.
   // Парсинг должен проходить в несколько шагов, в первую очередь определение приоритетов и списка статей, далее отсылка заданий парсерам и третье, сбор всей информации в одном месте

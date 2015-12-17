@@ -32,6 +32,8 @@ object Dependencies {
   val config            = "com.typesafe"                %  "config"                     % "1.2.0"
   val scopt             = "com.github.scopt"            %% "scopt"                      % "3.2.0"
 
+  val twitter4J         = "org.twitter4j"               %  "twitter4j-core"             % "4.0.4"
+
   val scalajHttp        = "org.scalaj"                  %% "scalaj-http"                % "2.0.0"
   val scalaXml          = "org.scala-lang.modules"      %% "scala-xml"                  % "1.0.2"
 
