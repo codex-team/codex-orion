@@ -29,9 +29,10 @@ object Main extends App {
     new TwitterStreamActor(TwitterStreamActor.twitterUri, analytic)
       with OAuthTwitterAuthorization), "twitter-parser")
 
+  // FIXME uncomment to get the consoleful of twitter logs =)
   twitterStream ! "ted"
 
   // TODO во время тика можно делать намного более хитрую логику, в том числе определять пул задач и приоритеты для выполнения парсинга.
   // Парсинг должен проходить в несколько шагов, в первую очередь определение приоритетов и списка статей, далее отсылка заданий парсерам и третье, сбор всей информации в одном месте
-  system.scheduler.schedule(4000 seconds, 5 seconds, parserDispatcher, DispatcherTask("Test", RussiaTodayParser))
+  system.scheduler.schedule(0 seconds, 5 seconds, parserDispatcher, DispatcherTask("Test", RussiaTodayParser))
 }
