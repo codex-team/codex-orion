@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props}
 import xyz.codex.orion.parser.RTParser
 
 
-case class LaunchCrawlersToGetLinks()
+case object LaunchCrawlersToGetLinks
 
 
 /**
