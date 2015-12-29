@@ -21,7 +21,6 @@ object Main extends App {
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
 
-
   // Twitter Context
   val analytic = system.actorOf(Props(new TwitterAnalytic), "twitter-analysis")
   val twitterStream = system.actorOf(Props(
@@ -29,8 +28,7 @@ object Main extends App {
       with OAuthTwitterAuthorization), "twitter-parser")
 
   // FIXME try to change words and see console full of logs.
-  twitterStream ! TrackWords(List("codex"))
-
+  // twitterStream ! TrackWords(List("Russia"))
 
   // Article Context
   val articlesCrawlerDispatcher: ActorRef = system.actorOf(Props[ArticlesCrawlerDispatcher], "articlesCrawlerDispatcher")
@@ -38,5 +36,5 @@ object Main extends App {
   val articlesLoader: ActorRef = system.actorOf(Props[ArticlesLoaderActor], "articlesLoader")
 
   articlesCrawlerDispatcher ! LaunchCrawlersToGetLinks
-  //system.scheduler.schedule(0 seconds, 15 seconds, articlesCrawlerDispatcher, LaunchCrawlersToGetLinks)
+  //TODO: EXAMPLE: system.scheduler.schedule(0 seconds, 15 seconds, articlesCrawlerDispatcher, LaunchCrawlersToGetLinks)
 }
