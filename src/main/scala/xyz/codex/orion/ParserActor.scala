@@ -1,7 +1,7 @@
 package xyz.codex.orion
 
-import akka.actor.{Actor, Props, ActorLogging}
-import xyz.codex.orion.parser.{GetArticleData, ArticlesParser, BaseParser}
+import akka.actor.{Actor, ActorLogging}
+import xyz.codex.orion.parser.{GetArticleData, BaseParser}
 
 case class LoadArticleLinks(parser : BaseParser)
 case class LoadArticle(parser : BaseParser, link : String)
